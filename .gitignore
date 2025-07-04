@@ -63,3 +63,4 @@ Thumbs.db
 /DocumentProcessingApp/appsettings.docker.json
 /DocumentProcessingApp/appsettings.local.json
 /AI.Agentic.Fronend/appsettings.Development.json
+/AI.Agentic.Fronend/wwwroot/static/js
