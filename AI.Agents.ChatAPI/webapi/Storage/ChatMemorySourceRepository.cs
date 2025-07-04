@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using CopilotChat.WebApi.Models.Storage;
+using System.ClientModel;
 
 namespace CopilotChat.WebApi.Storage;
 
@@ -26,7 +27,14 @@ public class ChatMemorySourceRepository : Repository<MemorySource>
     /// <returns>A list of memory sources.</returns>
     public Task<IEnumerable<MemorySource>> FindByChatIdAsync(string chatId, bool includeGlobal = true)
     {
-        return base.StorageContext.QueryEntitiesAsync(e => e.ChatId == chatId || (includeGlobal && e.ChatId == Guid.Empty.ToString()));
+        var files = base.StorageContext.QueryEntitiesAsync(e => e.ChatId == chatId || (includeGlobal && e.ChatId == Guid.Empty.ToString()));
+        var file = files.Result.FirstOrDefault();
+        if (file != null)
+        {
+            var mc = base.StorageContext.ReadAsync(file.Id, file.Partition).Result;
+            
+        }
+        return files;
     }
 
     /// <summary>

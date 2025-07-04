@@ -4,6 +4,7 @@ import { Constants } from '../../../Constants';
 import GithubIcon from '../../../assets/plugin-icons/github.png';
 import JiraIcon from '../../../assets/plugin-icons/jira.png';
 import GraphIcon from '../../../assets/plugin-icons/ms-graph.png';
+import AzureDoc from '../../../assets/bot-icons/bot-icon-1.png'; 
 
 /*
  * For each OpenAPI Spec you're supporting in the Kernel,
@@ -14,6 +15,7 @@ export const enum BuiltInPlugins {
     Jira = 'Jira',
     GitHub = 'GitHub',
     MsGraphObo = 'Microsoft Graph OBO',
+    CustomDocumentService = 'Azure AI Document Inteliggent Service Custom'
 }
 
 export const enum AuthHeaderTags {
@@ -21,6 +23,7 @@ export const enum AuthHeaderTags {
     Jira = 'jira',
     GitHub = 'github',
     MsGraphObo = 'msgraphobo',
+    CustomDocumentService = 'customdocumentinteligence'
 }
 
 export interface PluginAuthRequirements {
@@ -140,6 +143,19 @@ export const initialState: PluginsState = {
                     helpLink: 'https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests',
                 },
             },
+        },
+        [BuiltInPlugins.CustomDocumentService]: {
+            name: BuiltInPlugins.CustomDocumentService,
+            publisher: 'MM',
+            description:
+                'Custom form 201 document service',
+            enabled: false,
+            authRequirements: {
+                Msal: true,
+                scopes: Constants.plugins.customAzureDocServiceScopes,
+            },
+            icon: AzureDoc,
+            headerTag: AuthHeaderTags.CustomDocumentService        
         },
     },
 };

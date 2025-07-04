@@ -88,6 +88,12 @@ public static class CopilotChatServiceExtensions
                 continue;
             }
 
+            if(plugin.Type == "buildin" || plugin.ManifestDomain == null )
+            {
+                logger.LogInformation("Plugin '{0}' is defined as buildin. Skipping...", plugin.Name);
+                continue;
+            }
+
             var pluginManifestUrl = PluginUtils.GetPluginManifestUri(plugin.ManifestDomain);
             using var request = new HttpRequestMessage(HttpMethod.Get, pluginManifestUrl);
             // Need to set the user agent to avoid 403s from some sites.

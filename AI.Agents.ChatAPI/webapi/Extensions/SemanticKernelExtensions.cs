@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.Reflection;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
@@ -9,9 +8,11 @@ using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Graph;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Plugins.Core;
+using System.Reflection;
 
 namespace CopilotChat.WebApi.Extensions;
 
@@ -138,7 +139,7 @@ internal static class SemanticKernelExtensions
         ServiceOptions options = sp.GetRequiredService<IOptions<ServiceOptions>>().Value;
         if (!string.IsNullOrWhiteSpace(options.SemanticPluginsDirectory))
         {
-            foreach (string subDir in Directory.GetDirectories(options.SemanticPluginsDirectory))
+            foreach (string subDir in System.IO.Directory.GetDirectories(options.SemanticPluginsDirectory))
             {
                 try
                 {
@@ -155,7 +156,7 @@ internal static class SemanticKernelExtensions
         if (!string.IsNullOrWhiteSpace(options.NativePluginsDirectory))
         {
             // Loop through all the files in the directory that have the .cs extension
-            var pluginFiles = Directory.GetFiles(options.NativePluginsDirectory, "*.cs");
+            var pluginFiles = System.IO.Directory.GetFiles(options.NativePluginsDirectory, "*.cs");
             foreach (var file in pluginFiles)
             {
                 // Parse the name of the class from the file name (assuming it matches)

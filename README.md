@@ -70,3 +70,21 @@ https://ai-chat-webapi.internal.ashysea-4f2a10ed.eastus2.azurecontainerapps.io
 
 for cors.
 https://ai-chat-webapi.ashysea-4f2a10ed.eastus2.azurecontainerapps.io
+
+
+##Authentication Chat
+1. create sepearte app with spa
+2. create separte app for api
+   details here: https://github.com/microsoft/chat-copilot/?tab=readme-ov-file
+
+
+##Agentic solution
+https://learn.microsoft.com/en-us/azure/ai-foundry/agents/
+
+plugins:
+https://www.developerscantina.com/p/semantic-kernel-bing-graph-plugins/
+
+
+##TODO
+
+1. binaryContent - fix from memoryItem to file storage?

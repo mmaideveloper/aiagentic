@@ -46,6 +46,7 @@ export const Constants = {
         // Your application registration will need to be granted these permissions in Azure Active Directory.
         msGraphScopes: ['Calendars.Read', 'Mail.Read', 'Mail.Send', 'Tasks.ReadWrite', 'User.Read'],
         msGraphOboScopes: ['[INCLUDE THE SCOPE FOR THE WEBAPI APP REGISTRATION HERE]'],
+        customAzureDocServiceScopes: ['api://73528cb0-3662-46ed-a073-cc13143ff89b/access_as_user']
     },
     KEYSTROKE_DEBOUNCE_TIME_MS: 250,
 };

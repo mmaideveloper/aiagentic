@@ -9,6 +9,7 @@ namespace CopilotChat.WebApi.Options;
 /// </summary>
 public class Plugin
 {
+    public Boolean Enabled { get; set; } = false;
     /// <summary>
     /// The name of the plugin.
     /// </summary>
@@ -23,4 +24,10 @@ public class Plugin
     /// The key of the plugin.
     /// </summary>
     public string Key { get; set; } = string.Empty;
+
+    public string ApiUrl { get; set; } = string.Empty;
+
+    public string Type { get; set; } = string.Empty;
+
+    public string FilePath { get; set; } = string.Empty;
 }

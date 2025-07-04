@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.Globalization;
-using System.Threading.Tasks;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Hubs;
@@ -11,11 +9,14 @@ using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
+using System.ClientModel;
+using System.Globalization;
+using System.IO;
+using System.Net.NetworkInformation;
+using System.Text;
 
 namespace CopilotChat.WebApi.Controllers;
 
@@ -201,6 +202,13 @@ public class DocumentController : ControllerBase
     private async Task<ImportResult> ImportDocumentAsync(IFormFile formFile, IKernelMemory memoryClient, Guid chatId)
     {
         this._logger.LogInformation("Importing document {0}", formFile.FileName);
+       
+        using var stream = formFile.OpenReadStream();
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        byte[] binaryContent = memoryStream.ToArray();
+
+        stream.Position = 0;
 
         // Create memory source
         MemorySource memorySource = new(
@@ -209,7 +217,8 @@ public class DocumentController : ControllerBase
             this._authInfo.UserId,
             MemorySourceType.File,
             formFile.Length,
-            hyperlink: null
+            hyperlink: null,
+            binaryContent: binaryContent
         );
 
         if (!(await this.TryUpsertMemorySourceAsync(memorySource)))
@@ -230,7 +239,6 @@ public class DocumentController : ControllerBase
         {
             try
             {
-                using var stream = formFile.OpenReadStream();
                 await memoryClient.StoreDocumentAsync(
                     this._promptOptions.MemoryIndexName,
                     memorySource.Id,

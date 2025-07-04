@@ -37,8 +37,8 @@ namespace DocumentProcessing.API.Services
             {
                 Name = request.Name,
                 Fields = new Dictionary<string, Field>(),
-                DocumentConfidence = result.Documents.First().Confidence,
-                TotalFields = result.Documents.First().Fields.Count()
+                DocumentConfidence = result.Documents.FirstOrDefault()?.Confidence ?? 0,
+                TotalFields = result.Documents.FirstOrDefault()?.Fields?.Count()?? 0
             };
 
             foreach (var doc in result.Documents)

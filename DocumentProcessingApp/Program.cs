@@ -1,3 +1,4 @@
+using DocumentProcessing.API.Modules;
 using DocumentProcessing.API.Services;
 using DocumentProcessingApp.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -101,11 +102,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/test", () => new
+app.MapGet("/test", () => new VersionResponse
 {
-    Name = "Example Minimal API",
-    Version = "0.0.1-preview",
-    Status = "Running"
+    Name = "DocumentIntelligence Azure Analyzer API",
+    Version = "0.0.1"
 });
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();

@@ -76,6 +76,8 @@ export const PluginGallery: React.FC = () => {
         function updateHostedPlugin() {
             setHostedPlugins([]);
             serviceInfo.availablePlugins.forEach((availablePlugin) => {
+                console.log(`Plugin ${availablePlugin.name} manifest domain: ${availablePlugin.manifestDomain}`);
+
                 getPluginManifest(availablePlugin.manifestDomain)
                     .then((manifest) => {
                         const newHostedPlugin = {
@@ -139,7 +141,7 @@ export const PluginGallery: React.FC = () => {
                         }
                     >
                         <Subtitle1 block className={classes.title}>
-                            Enable Chat Copilot Plugins
+                            Enable Chat Copilot Plugins (AI)
                         </Subtitle1>
                         <Body1 as="p" block className={classes.description}>
                             Authorize plugins and have more powerful bots!

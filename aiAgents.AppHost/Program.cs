@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var api = builder.AddProject<Projects.DocumentProcessing_API>("documentprocessingapi");
+var api = builder.AddProject<Projects.DocumentProcessing_API>("documentprocessingapi")
+    .WithExternalHttpEndpoints();
 
 var web = builder.AddProject<Projects.DocumentIntelligenceWeb>("documentintelligenceweb")
     .WithExternalHttpEndpoints()

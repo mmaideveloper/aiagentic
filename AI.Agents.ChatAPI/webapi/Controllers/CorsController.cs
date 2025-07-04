@@ -2,6 +2,9 @@
 
 namespace CopilotChat.WebApi.Controllers
 {
+    /// <summary>
+    /// Shows list of available origins 
+    /// </summary>
     [ApiController]
     [Route("/cors")]
     public class CorsController : ControllerBase

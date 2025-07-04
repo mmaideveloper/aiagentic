@@ -21,7 +21,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
+using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Plugins.MsGraph;
 using Microsoft.SemanticKernel.Plugins.MsGraph.Connectors;
 using Microsoft.SemanticKernel.Plugins.MsGraph.Connectors.Client;
@@ -43,10 +45,16 @@ public class ChatController : ControllerBase, IDisposable
     private readonly MsGraphOboPluginOptions _msGraphOboPluginOptions;
     private readonly PromptsOptions _promptsOptions;
     private readonly IDictionary<string, Plugin> _plugins;
+    private readonly IConfiguration _configuration;
+    private readonly IKernelMemory _memoryClient;
+    private readonly ChatMemorySourceRepository _sourceRepository;
+    private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
 
     private const string ChatPluginName = nameof(ChatPlugin);
     private const string ChatFunctionName = "Chat";
     private const string GeneratingResponseClientCall = "ReceiveBotResponseStatus";
+
+    private readonly ChatMessageRepository _messageRepository;
 
     public ChatController(
         ILogger<ChatController> logger,
@@ -55,7 +63,12 @@ public class ChatController : ControllerBase, IDisposable
         IOptions<ServiceOptions> serviceOptions,
         IOptions<MsGraphOboPluginOptions> msGraphOboPluginOptions,
         IOptions<PromptsOptions> promptsOptions,
-        IDictionary<string, Plugin> plugins)
+        IDictionary<string, Plugin> plugins,
+        IConfiguration configuration,
+        IKernelMemory memoryClient,
+        ChatMemorySourceRepository sourceRepository,
+        IHubContext<MessageRelayHub> messageRelayHubContext,
+        ChatMessageRepository messageRepository)
     {
         this._logger = logger;
         this._httpClientFactory = httpClientFactory;
@@ -65,6 +78,12 @@ public class ChatController : ControllerBase, IDisposable
         this._msGraphOboPluginOptions = msGraphOboPluginOptions.Value;
         this._promptsOptions = promptsOptions.Value;
         this._plugins = plugins;
+        _configuration = configuration;
+        _memoryClient = memoryClient;
+        _sourceRepository = sourceRepository;
+        _messageRelayHubContext = messageRelayHubContext;
+
+        _messageRepository = messageRepository;
     }
 
     /// <summary>
@@ -119,7 +138,7 @@ public class ChatController : ControllerBase, IDisposable
 
         // Register hosted plugins that have been enabled
         await this.RegisterHostedFunctionsAsync(kernel, chat!.EnabledPlugins);
-
+    
         // Get the function to invoke
         KernelFunction? chatFunction = kernel.Plugins.GetFunction(ChatPluginName, ChatFunctionName);
 
@@ -219,6 +238,12 @@ public class ChatController : ControllerBase, IDisposable
             tasks.Add(this.RegisterMicrosoftGraphOBOPlugins(kernel, graphOboAuthHeader));
         }
 
+        if (authHeaders.TryGetValue("CUSTOMDOCUMENTINTELIGENCE", out string? customDocumentServiceAuthHeader))
+        {
+            tasks.Add(this.RegisterCustomDocumentServicePlugins(kernel,customDocumentServiceAuthHeader, authHeaders));
+        }
+
+
         if (variables.TryGetValue("customPlugins", out object? customPluginsString))
         {
             tasks.AddRange(this.RegisterCustomPlugins(kernel, customPluginsString, authHeaders));
@@ -282,6 +307,37 @@ public class ChatController : ControllerBase, IDisposable
         kernel.ImportPluginFromObject(
             new MsGraphOboPlugin(graphOboAuthHeader, this._httpClientFactory, this._msGraphOboPluginOptions, this._promptsOptions.FunctionCallingTokenLimit, this._logger),
             "msGraphObo");
+        return Task.CompletedTask;
+    }
+
+    private Task RegisterCustomDocumentServicePlugins(Kernel kernel, string customDSHeader, Dictionary<string,string> authHeader)
+    {
+        this._logger.LogInformation("Enabling Custom DS Plugin.");
+        //enable plugin
+        //if (!kernel.Plugins.Any(p => p.Name == "customDocumentService"))
+        //{
+            BearerAuthenticationProvider authenticationProvider = new(() => Task.FromResult(customDSHeader));
+
+        
+        var plugin = kernel.ImportPluginFromObject(
+            new CustomDocumentServicePlugin(
+                customDSHeader, 
+                this._httpClientFactory, 
+                1000, 
+                this._logger, 
+                this._configuration, 
+                authenticationProvider,
+                kernel,
+                memoryClient: _memoryClient,
+                sourceRepository: _sourceRepository,
+                _messageRelayHubContext,
+               _messageRepository),
+            "customDocumentService");
+
+       
+            //kernel.Plugins.Add(plugin);
+        //}
+        
         return Task.CompletedTask;
     }
 
@@ -497,6 +553,15 @@ public class BearerAuthenticationProvider
     {
         var token = await this._bearerTokenDelegate().ConfigureAwait(false);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    /// <summary>
+    /// Applies the token to the provided HTTP request message.
+    /// </summary>
+    /// <param name="request">The HTTP request message.</param>
+    public async Task<string> GetToken()
+    {
+        return await this._bearerTokenDelegate().ConfigureAwait(false);
     }
 
     /// <summary>

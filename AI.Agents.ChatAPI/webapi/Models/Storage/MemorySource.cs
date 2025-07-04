@@ -20,6 +20,8 @@ public enum MemorySourceType
 /// </summary>
 public class MemorySource : IStorageEntity
 {
+    [JsonPropertyName("content")]
+    public byte[] BinaryContent { get; set; }
     /// <summary>
     /// Source ID that is persistent and unique.
     /// </summary>
@@ -88,7 +90,7 @@ public class MemorySource : IStorageEntity
     {
     }
 
-    public MemorySource(string chatId, string name, string sharedBy, MemorySourceType type, long size, Uri? hyperlink)
+    public MemorySource(string chatId, string name, string sharedBy, MemorySourceType type, long size, Uri? hyperlink, byte[] binaryContent)
     {
         this.Id = Guid.NewGuid().ToString();
         this.ChatId = chatId;
@@ -98,5 +100,6 @@ public class MemorySource : IStorageEntity
         this.SharedBy = sharedBy;
         this.CreatedOn = DateTimeOffset.Now;
         this.Size = size;
+        this.BinaryContent = binaryContent;
     }
 }

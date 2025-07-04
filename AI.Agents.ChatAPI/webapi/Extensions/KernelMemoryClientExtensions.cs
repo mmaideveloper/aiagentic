@@ -146,7 +146,7 @@ internal static class KernelMemoryClientExtensions
                 DocumentId = documentId,
                 Files = new List<DocumentUploadRequest.UploadedFile> { new(fileName, fileContent) },
                 Index = indexName,
-                Steps = s_pipelineSteps,
+                Steps = [], //s_pipelineSteps,
             };
 
         uploadRequest.Tags.Add(MemoryTags.TagChatId, chatId);

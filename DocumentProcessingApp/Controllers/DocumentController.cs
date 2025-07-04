@@ -73,6 +73,7 @@ namespace DocumentProcessingApp.Controllers
 
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(typeof(DocumenProcessResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Upload(IFormFile file, string model = "creditorInfo_us_bankruptcy_form_201_201512-v2")
         {
             if (file == null || file.Length == 0)
@@ -82,6 +83,14 @@ namespace DocumentProcessingApp.Controllers
 
             var containerPath = PrepareContainerPath();
             var filePath = Path.Combine($"{containerPath}", file.FileName);
+            // Check if the file already exists, if so, rename it to avoid conflicts
+            if ( System.IO.File.Exists(filePath))
+            {
+                _logger.LogInformation("File already exists, deleting: " + filePath);
+                //System.IO.File.Delete(filePath);
+                filePath = Path.Combine($"{containerPath}", $"{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}_{file.FileName}"); //rename file to avoid conflicts
+            }
+
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
