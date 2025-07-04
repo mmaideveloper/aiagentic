@@ -1,0 +1,65 @@
+.azure
+/.vs
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.ide
+
+# Build artifacts
+bin/
+obj/
+out/
+
+# ASP.NET and .NET artifacts
+*.dll
+*.exe
+*.pdb
+*.nuget
+*.nupkg
+project.lock.json
+project.assets.json
+
+# npm and node_modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build files
+build/
+public/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+debug.log
+
+# Coverage reports
+coverage/
+
+# VS Code settings
+.vscode/
+
+# JetBrains Rider settings
+.idea/
+
+# Misc
+.DS_Store
+Thumbs.db
+/AI.Agentic.Fronend/dist/static/react
+/DocumentProcessingApp/uploads
+/ConsoleAppAIAgent/appsettings.development.json
+/DocumentIntelligenceWeb/appsettings.development.json
+/DocumentIntelligenceWeb/appsettings.docker.json
+/DocumentIntelligenceWeb/appsettings.local.json
+/DocumentIntelligenceWeb/appsettings.localb2c.json
+/DocumentProcessingApp/appsettings.development.json
+/DocumentProcessingApp/appsettings.docker.json
+/DocumentProcessingApp/appsettings.local.json
+/AI.Agentic.Fronend/appsettings.Development.json

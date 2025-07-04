@@ -1,0 +1,88 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppAIAgent", "ConsoleAppAIAgent\ConsoleAppAIAgent.csproj", "{CE4489DF-A341-4F07-B083-1A7656E3F9DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentProcessing.API", "DocumentProcessingApp\DocumentProcessing.API.csproj", "{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aiAgents.AppHost", "aiAgents.AppHost\aiAgents.AppHost.csproj", "{B9D82743-50AA-44C1-A6B3-15223F16F719}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aiAgents.ServiceDefaults", "aiAgents.ServiceDefaults\aiAgents.ServiceDefaults.csproj", "{60D473C5-681C-563F-E309-2E17F322262B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentIntelligenceWeb", "DocumentIntelligenceWeb\DocumentIntelligenceWeb.csproj", "{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{E6D4BD87-B9F2-4DF1-A1F7-B2EC83F66364}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{434917DB-2063-485A-98A2-9F932B2CF0FF}"
+	ProjectSection(SolutionItems) = preProject
+		azure.yaml = azure.yaml
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotChatWebApi", "AI.Agents.ChatAPI\webapi\CopilotChatWebApi.csproj", "{D5D40064-C97C-A97B-38B6-6C18AF8BB053}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotChatShared", "AI.Agents.Shared\CopilotChatShared.csproj", "{ACB3990B-E2BD-B549-DBEE-6E792212307D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ChatAgent", "ChatAgent", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{394B5009-D476-4FAB-B9AF-8C1D71F9087D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocumentIntelligenceService", "DocumentIntelligenceService", "{55C23BA2-4B19-415B-8288-F98249C096C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI.Agentic.Fronend", "AI.Agentic.Fronend\AI.Agentic.Fronend.csproj", "{18797E8B-FD33-6BE2-4454-50ECD0F6610B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE4489DF-A341-4F07-B083-1A7656E3F9DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4489DF-A341-4F07-B083-1A7656E3F9DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4489DF-A341-4F07-B083-1A7656E3F9DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4489DF-A341-4F07-B083-1A7656E3F9DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9D82743-50AA-44C1-A6B3-15223F16F719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9D82743-50AA-44C1-A6B3-15223F16F719}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9D82743-50AA-44C1-A6B3-15223F16F719}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9D82743-50AA-44C1-A6B3-15223F16F719}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60D473C5-681C-563F-E309-2E17F322262B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60D473C5-681C-563F-E309-2E17F322262B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60D473C5-681C-563F-E309-2E17F322262B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60D473C5-681C-563F-E309-2E17F322262B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE4489DF-A341-4F07-B083-1A7656E3F9DF} = {394B5009-D476-4FAB-B9AF-8C1D71F9087D}
+		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07} = {55C23BA2-4B19-415B-8288-F98249C096C4}
+		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC} = {55C23BA2-4B19-415B-8288-F98249C096C4}
+		{D5D40064-C97C-A97B-38B6-6C18AF8BB053} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{ACB3990B-E2BD-B549-DBEE-6E792212307D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C5343FD-F432-4729-AF09-E90ABE9EE243}
+	EndGlobalSection
+EndGlobal

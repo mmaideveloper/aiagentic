@@ -1,0 +1,6 @@
+@AIAgentForSqlServer.API_HostAddress = http://localhost:5083
+
+GET {{AIAgentForSqlServer.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

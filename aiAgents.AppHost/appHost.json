@@ -1,0 +1,9 @@
+{
+  "executables": [
+    {
+      "name": "react-app",
+      "path": "C:\\path\\to\\your\\react\\app",
+      "command": "npm start"
+    }
+  ]
+}

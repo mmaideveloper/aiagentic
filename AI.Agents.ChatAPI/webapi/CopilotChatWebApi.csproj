@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>CopilotChat.WebApi</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <UserSecretsId>5ee045b0-aea3-4f08-8d31-32d1a6f8fed0</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.52.0-preview.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.9.3" />
+	<PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.98.250508.3" />
+	<PackageReference Include="Microsoft.SemanticKernel" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureAISearch" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.MsGraph" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.OpenApi" Version="1.55.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.55.0-alpha" />
+    <PackageReference Include="SharpToken" Version="2.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cert\certificate.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="data\eng.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="cert\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AI.Agents.Shared\CopilotChatShared.csproj" />
+    <ProjectReference Include="..\..\aiAgents.ServiceDefaults\aiAgents.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+}
+<h1>@ViewData["Title"]</h1>
+
+<lable id="chatHistory" />
+
+<p>
+    <form method="post" enctype="multipart/form-data" asp-controller="Agentic" asp-action="Upload">   
+        <input type="text" name="chatInput" id="chatInput" style="width:50rem;" />      
+        <button type="submit" id="submitButton">Send</button>
+    </form>
+</p>

@@ -1,0 +1,90 @@
+﻿@model UploadResponse
+
+@{
+    ViewData["Title"] = "Document Intelligent Service Analysis";
+    var KnownList = new[]
+    {
+        "CaseNumber",
+        "Deptor",
+        "DeptorFederalEmployerEIN",
+        "Court",
+        "FormVersion",
+        "form_14",
+        "form_15",
+        "form_16"
+    };
+}
+
+<h4>File: @Model.FileName</h4>
+<br/>
+Name:@Model.Url
+<br/>
+Total Fields:
+<br/>
+<h3>@Model.DocumentResponse.TotalFields</h3>
+<br/>
+Confidence:
+<br/>
+<h3>@Model.DocumentResponse.DocumentConfidence</h3>
+<br/>
+Selected Fields:
+<br/>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid black; padding: 8px;">Name</th>
+            <th style="border: 1px solid black; padding: 8px;">Value</th>
+            <th style="border: 1px solid black; padding: 8px;">Region</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    @foreach (var field in @Model.DocumentResponse.Fields)
+    {
+            
+                @if (KnownList.Any(s => s.Contains(field.Key) || 
+                  ( field.Key.Contains("form_") && field.Key.StartsWith(s) )))
+                {
+                <tr>
+                    <td style="border: 1px solid black; padding: 8px;">@field.Key</td>
+
+                    @if(field.Key.StartsWith("form_"))
+                    {
+                        if( field.Value.Value == ":selected:")
+                        {
+                            <td style="border: 1px solid black; padding: 8px;"><input type="checkbox" checked /></td>
+                        }
+                        else
+                        {
+                            <td style="border: 1px solid black; padding: 8px;"><input type="checkbox" /></td>
+                        }                      
+                    }             
+                    else{
+                        <td style="border: 1px solid black; padding: 8px;">@field.Value.Value</td>
+                    }
+                    <td style="border: 1px solid black; padding: 8px;">@field.Value.Region.ToString()</td>
+                   </tr>
+                }
+    }
+</tbody>
+</table>
+<br/>
+All Fields:
+<br/>
+@foreach(var field in @Model.DocumentResponse.Fields)
+{
+    if(KnownList.Any(s => s.Contains(field.Key)))
+    {
+        <span>Name:</span>
+        <span style="color:red">@field.Key</span>
+    }
+    else
+    {
+        <span>Name:@field.Key</span>
+    }
+     <span>Value:@field.Value.Value</span>
+     <br/>
+}
+
+
+

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ConsoleAppAIAgent": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

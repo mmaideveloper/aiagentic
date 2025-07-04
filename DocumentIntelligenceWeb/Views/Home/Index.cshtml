@@ -1,0 +1,25 @@
+﻿@model UploadRequest
+
+@{
+    ViewData["Title"] = "Uploading File";
+}
+
+<h2>Upload a File</h2>
+<form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Upload" onsubmit="return sendRequest(event);">
+    <label>Input Field(*):</label>
+    <br/>
+    <input type="file" name="file" id="fileInput" asp-for="File" style="width:50rem;" onchange="enableButton()" />
+
+    <br/>
+    <br/>
+
+    <label>Input AI Model:</label>
+    <br/>
+    <input type="text" name="modul" style="width:50rem;" value="creditor-form201-compose-v1" onchange="enableButton()" />
+    <br/>
+    <br/>
+    <button type="submit" id="submitButton" disabled>Analyzer Document</button>
+</form>
+
+
+<span id="message" style="margin-left: 40%; font-weight: bold;"></span>
