@@ -16,6 +16,7 @@ using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.Models;
 using Microsoft.SemanticKernel;
@@ -54,6 +55,8 @@ public sealed class CustomDocumentServicePlugin
     private readonly IKernelMemory _memoryClient;
 
     private readonly ChatMessageRepository _messageRepository;
+
+    private readonly KernelArguments _variables;
     ///// <summary>
     ///// A repository to save and retrieve chat messages.
     ///// </summary>
@@ -94,6 +97,7 @@ public sealed class CustomDocumentServicePlugin
     //   PlannerOptions.OboOptions:
     //     Configuration for the plugin defined in appsettings.json.
     public CustomDocumentServicePlugin(
+        KernelArguments variables,
         string bearerToken, 
         IHttpClientFactory clientFactory, 
         int responseTokenLimit, 
@@ -137,16 +141,67 @@ public sealed class CustomDocumentServicePlugin
         this._sourceRepository = sourceRepository;
         this._messageRelayHubContext = messageRelayHubContext;
         this._messageRepository = messageRepository;
+        this._variables = variables;
     }
 
     [KernelFunction("demo"), Description("check if custom document service is enabled.")]
     public async Task<string> DemoCallApiTasksAsync(
+        [Description("Chat ID to extract history from")]
         string chatId,
+        KernelArguments context,
         CancellationToken cancellationToken = default)
     {
-        return "This is test custom document service plugin.";
+        var chatIdString = _variables["chatId"].ToString();
+        //var chatMessage = CopilotChatMessage.CreateBotResponseMessage(chatId, "testPLG", "testPromt", null);
+        await this.ShowMessage($"This is test custom document service plugin.{chatIdString}");
+
+        return $"This is test custom document service plugin.{chatIdString} DateTime: {DateTime.UtcNow}";
     }
-        
+
+    private async Task ShowMessage(string message)
+    {
+        var chatId = _variables["chatId"].ToString();
+        var userId = _variables["userId"].ToString();
+
+        /*
+        // Create the stream
+        var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
+        var stream =
+            chatCompletion.GetStreamingChatMessageContentsAsync(
+                prompt.MetaPromptTemplate,
+                this.CreateChatRequestSettings(),
+                this._kernel,
+                cancellationToken);
+
+        // Create message on client
+        var chatMessage = await this.CreateBotMessageOnClient(
+            chatId,
+            userId,
+            JsonSerializer.Serialize(prompt),
+            string.Empty,
+            cancellationToken,
+            citations
+        );
+
+        var chatMessage = await this.CreateBotMessageOnClient(
+           chatId,
+           userId,
+           JsonSerializer.Serialize(prompt),
+           string.Empty,
+           cancellationToken,
+           citations
+       );
+
+        await _messageRelayHubContext.Clients.Group(chatId).SendAsync("ReceiveMessageUpdate",chatMessage, null);
+        */
+        var chatMessage = CopilotChatMessage.CreateBotResponseMessage(chatId, message, nameof(CustomDocumentServicePlugin),null,null);
+        await this._messageRelayHubContext.Clients.Group(chatId).SendAsync("ReceiveMessage", chatId, userId, chatMessage);
+
+
+        //await this._messageRepository.CreateAsync(CopilotChatMessage.CreateBotResponseMessage(chatId, message, nameof(CustomDocumentServicePlugin), null, null));
+
+    }
+
     [KernelFunction("extract_fields_form_201_from_pdf_document"), 
         Description("Extracts structured fields from a PDF using the company's custom Document Intelligence model. Use this for all PDF field extraction.")]
     public async Task<string> CallApiTasksAsync(
@@ -155,19 +210,17 @@ public sealed class CustomDocumentServicePlugin
         string filePath,
         [Description("string with file name that was upload, or ask for upload a file for that action")] string fileName,
         [Description("string with id of file that was uploaded")] string fileId,
-         [Description("Chat ID to extract history from")]
-        string chatId,
         [Description("file stream of bytes of uploaded files represented as base64")] string fileStreamAsString = null,
         [Description("string with the LLM module name needed to execute the API call")] string module = null,
         CancellationToken cancellationToken = default)
     {
-        await this._messageRepository.CreateAsync(CopilotChatMessage.CreateBotResponseMessage(chatId, "test", "prompt_test", null, null));
+        var chatId = _variables["chatId"].ToString();
 
-        var chatHistory = new ChatHistory();
-       
+        await this.ShowMessage("Initialize custom document service call...");
+
         try {
 
-            chatHistory.AddAssistantMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}");
+            await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}");
 
         
         var token = await _authenticationProvider.GetToken();
@@ -175,7 +228,7 @@ public sealed class CustomDocumentServicePlugin
         var apiUrl = plugins.FirstOrDefault(p => p.Name == "CustomDocumentService")?.ApiUrl;
         var apiToCall = $"{apiUrl}api/upload";
 
-            chatHistory.AddAssistantMessage($"Customer Document Intelligne Service {fileName} loaded.");
+            await this.ShowMessage($"Customer Document Intelligne Service {fileName} loaded.");
 
             var graphResponseContent = string.Empty;
         var accessToken = token; // await this.GetAccessTokenAsync(cancellationToken);
@@ -190,7 +243,7 @@ public sealed class CustomDocumentServicePlugin
                 form.Add(streamContent, "file", fileName );
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                chatHistory.AddAssistantMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Request send to {apiToCall}");
+                await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Request send to {apiToCall}");
 
                 // Send request to API
                 var response = await client.PostAsync($"{apiToCall}?model={module}", form);
@@ -198,16 +251,16 @@ public sealed class CustomDocumentServicePlugin
 
                 if (response.IsSuccessStatusCode)
                 {
-                    chatHistory.AddDeveloperMessage(resultW);
+                    await this.ShowMessage(resultW);
 
-                    chatHistory.AddAssistantMessage($"Customer Document Intelligne Service for FORM 201 finalized file: {fileName}. Sucessfully.");
+                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 finalized file: {fileName}. Sucessfully.");
                     return resultW;
                 }
                 else
                 {
-                    chatHistory.AddDeveloperMessage($"Error from {apiToCall}.{resultW} Status code: {response.Version.ToString()}");
+                    await this.ShowMessage($"Error from {apiToCall}.{resultW} Status code: {response.Version.ToString()}");
 
-                    chatHistory.AddAssistantMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Failed.");
+                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Failed.");
 
                 }
             }
@@ -215,7 +268,7 @@ public sealed class CustomDocumentServicePlugin
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling CustomDocumentServicePlugin: {Message}", ex.Message);
-            chatHistory.AddDeveloperMessage(ex.Message);
+            await this.ShowMessage(ex.Message);
         }
 
         return string.Empty;

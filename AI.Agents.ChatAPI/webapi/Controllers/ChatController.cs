@@ -16,6 +16,7 @@ using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -49,6 +50,7 @@ public class ChatController : ControllerBase, IDisposable
     private readonly IKernelMemory _memoryClient;
     private readonly ChatMemorySourceRepository _sourceRepository;
     private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
+    private readonly ChatSessionRepository _sessionRepository;
 
     private const string ChatPluginName = nameof(ChatPlugin);
     private const string ChatFunctionName = "Chat";
@@ -134,7 +136,7 @@ public class ChatController : ControllerBase, IDisposable
 
         // Register plugins that have been enabled
         var openApiPluginAuthHeaders = this.GetPluginAuthHeaders(this.HttpContext.Request.Headers);
-        await this.RegisterFunctionsAsync(kernel, openApiPluginAuthHeaders, contextVariables);
+        await this.RegisterFunctionsAsync(kernel, openApiPluginAuthHeaders, contextVariables, chat);
 
         // Register hosted plugins that have been enabled
         await this.RegisterHostedFunctionsAsync(kernel, chat!.EnabledPlugins);
@@ -208,7 +210,9 @@ public class ChatController : ControllerBase, IDisposable
     /// <summary>
     /// Register functions with the kernel.
     /// </summary>
-    private async Task RegisterFunctionsAsync(Kernel kernel, Dictionary<string, string> authHeaders, KernelArguments variables)
+    private async Task RegisterFunctionsAsync(Kernel kernel, Dictionary<string, string> authHeaders, 
+        KernelArguments variables,
+        ChatSession chat)
     {
         // Register authenticated functions with the kernel only if the request includes an auth header for the plugin.
 
@@ -240,7 +244,10 @@ public class ChatController : ControllerBase, IDisposable
 
         if (authHeaders.TryGetValue("CUSTOMDOCUMENTINTELIGENCE", out string? customDocumentServiceAuthHeader))
         {
-            tasks.Add(this.RegisterCustomDocumentServicePlugins(kernel,customDocumentServiceAuthHeader, authHeaders));
+            tasks.Add(this.RegisterCustomDocumentServicePlugins(
+                kernel,customDocumentServiceAuthHeader, authHeaders,
+                variables,
+                chat));
         }
 
 
@@ -310,17 +317,23 @@ public class ChatController : ControllerBase, IDisposable
         return Task.CompletedTask;
     }
 
-    private Task RegisterCustomDocumentServicePlugins(Kernel kernel, string customDSHeader, Dictionary<string,string> authHeader)
+    private async Task RegisterCustomDocumentServicePlugins(Kernel kernel, string customDSHeader, 
+        Dictionary<string,string> authHeader, 
+        KernelArguments variables,
+        ChatSession chat)
     {
+        const string PLUGIN_CUSTOM_DOCUMENT_SERVICE = "customDocumentService";
+
         this._logger.LogInformation("Enabling Custom DS Plugin.");
-        //enable plugin
-        //if (!kernel.Plugins.Any(p => p.Name == "customDocumentService"))
-        //{
+        
+        if (!kernel.Plugins.Any(p => p.Name == PLUGIN_CUSTOM_DOCUMENT_SERVICE))
+        {
             BearerAuthenticationProvider authenticationProvider = new(() => Task.FromResult(customDSHeader));
 
         
         var plugin = kernel.ImportPluginFromObject(
             new CustomDocumentServicePlugin(
+                variables,
                 customDSHeader, 
                 this._httpClientFactory, 
                 1000, 
@@ -332,13 +345,18 @@ public class ChatController : ControllerBase, IDisposable
                 sourceRepository: _sourceRepository,
                 _messageRelayHubContext,
                _messageRepository),
-            "customDocumentService");
+            PLUGIN_CUSTOM_DOCUMENT_SERVICE);
+        }
 
-       
-            //kernel.Plugins.Add(plugin);
-        //}
-        
-        return Task.CompletedTask;
+        //
+        if(chat !=null && chat.EnabledPlugins.FirstOrDefault( p=> p == PLUGIN_CUSTOM_DOCUMENT_SERVICE) == null)
+        {
+            var chatIdString = chat.Id;
+            chat.EnabledPlugins.Add(PLUGIN_CUSTOM_DOCUMENT_SERVICE);
+            //await this._sessionRepository.UpsertAsync(chat);
+            await _messageRelayHubContext.Clients.Group(chatIdString).SendAsync(PluginController.PluginStateChanged, chatIdString, PLUGIN_CUSTOM_DOCUMENT_SERVICE, true);
+
+        }
     }
 
     /// <summary>

@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotChatWebApi", "AI.Agents.ChatAPI\webapi\CopilotChatWebApi.csproj", "{D5D40064-C97C-A97B-38B6-6C18AF8BB053}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotChatShared", "AI.Agents.Shared\CopilotChatShared.csproj", "{ACB3990B-E2BD-B549-DBEE-6E792212307D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ChatAgent", "ChatAgent", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
@@ -32,6 +30,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocumentIntelligenceService", "DocumentIntelligenceService", "{55C23BA2-4B19-415B-8288-F98249C096C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI.Agentic.Fronend", "AI.Agentic.Fronend\AI.Agentic.Fronend.csproj", "{18797E8B-FD33-6BE2-4454-50ECD0F6610B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotChatWebApi", "AI.Agents.ChatAPI\webapi\CopilotChatWebApi.csproj", "{FC7D832F-13A0-42DD-A743-ABFF22AFB234}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{AD374F5A-8958-4EF1-962A-4CAE077848A9}"
+	ProjectSection(SolutionItems) = preProject
+		post_provision.sh = post_provision.sh
+		pre_provision.sh = pre_provision.sh
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +65,6 @@ Global
 		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5D40064-C97C-A97B-38B6-6C18AF8BB053}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACB3990B-E2BD-B549-DBEE-6E792212307D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,6 +73,10 @@ Global
 		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18797E8B-FD33-6BE2-4454-50ECD0F6610B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC7D832F-13A0-42DD-A743-ABFF22AFB234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC7D832F-13A0-42DD-A743-ABFF22AFB234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC7D832F-13A0-42DD-A743-ABFF22AFB234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC7D832F-13A0-42DD-A743-ABFF22AFB234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,8 +85,8 @@ Global
 		{CE4489DF-A341-4F07-B083-1A7656E3F9DF} = {394B5009-D476-4FAB-B9AF-8C1D71F9087D}
 		{2C2D0FAF-43EE-7CB8-CA25-44BB38635E07} = {55C23BA2-4B19-415B-8288-F98249C096C4}
 		{ABED637D-B2D6-8293-2A25-CC4A913DA4CC} = {55C23BA2-4B19-415B-8288-F98249C096C4}
-		{D5D40064-C97C-A97B-38B6-6C18AF8BB053} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{ACB3990B-E2BD-B549-DBEE-6E792212307D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FC7D832F-13A0-42DD-A743-ABFF22AFB234} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C5343FD-F432-4729-AF09-E90ABE9EE243}

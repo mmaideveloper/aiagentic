@@ -4,6 +4,7 @@ using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat;
+using CopilotChat.WebApi.Plugins.Services;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Builder;
@@ -92,6 +93,9 @@ internal static class SemanticKernelExtensions
     /// </summary>
     public static Kernel RegisterChatPlugin(this Kernel kernel, IServiceProvider sp)
     {
+        var logger = kernel.LoggerFactory.CreateLogger(nameof(SemanticKernelExtensions));
+        logger.BeginScope("Registering Chat Copilot functions");
+
         // Chat plugin
         kernel.ImportPluginFromObject(
             new ChatPlugin(
@@ -105,6 +109,27 @@ internal static class SemanticKernelExtensions
                 contentSafety: sp.GetService<AzureContentSafety>(),
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>()),
             nameof(ChatPlugin));
+        logger.BeginScope("Registering Custom Chat Copilot functions");
+
+        // Register chat archive embedding config
+        kernel.ImportPluginFromObject(new EmailAgent(sp.GetRequiredService<IConfiguration>()), "CustomEmailAgent");
+        logger.BeginScope("Registering Custom Email Copilot functions");
+
+        kernel.ImportPluginFromObject(new CustomDocumentServicePlugin
+        {
+             variables,
+                customDSHeader,
+                this._httpClientFactory,
+                1000,
+                this._logger,
+                this._configuration,
+                authenticationProvider,
+                kernel,
+                memoryClient: _memoryClient,
+                sourceRepository: _sourceRepository,
+                _messageRelayHubContext,
+               _messageRepository
+        });
 
         return kernel;
     }
@@ -124,6 +149,8 @@ internal static class SemanticKernelExtensions
 
         // Time plugin
         kernel.ImportPluginFromObject(new TimePlugin(), nameof(TimePlugin));
+
+        //
 
         return Task.CompletedTask;
     }

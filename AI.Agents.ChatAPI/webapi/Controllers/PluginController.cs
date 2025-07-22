@@ -22,7 +22,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class PluginController : ControllerBase
 {
-    private const string PluginStateChanged = "PluginStateChanged";
+    public const string PluginStateChanged = "PluginStateChanged";
     private readonly ILogger<PluginController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDictionary<string, Plugin> _availablePlugins;

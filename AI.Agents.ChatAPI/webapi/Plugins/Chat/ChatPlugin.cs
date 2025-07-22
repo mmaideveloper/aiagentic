@@ -74,7 +74,6 @@ public class ChatPlugin
     /// Azure content safety moderator.
     /// </summary>
     private readonly AzureContentSafety? _contentSafety = null;
-
     /// <summary>
     /// Create a new instance of <see cref="ChatPlugin"/>.
     /// </summary>
@@ -87,7 +86,7 @@ public class ChatPlugin
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
         ILogger logger,
-        AzureContentSafety? contentSafety = null)
+    AzureContentSafety? contentSafety = null)
     {
         this._logger = logger;
         this._kernel = kernel;
@@ -102,6 +101,7 @@ public class ChatPlugin
 
         this._contentSafety = contentSafety;
     }
+
 
     /// <summary>
     /// Method that wraps GetAllowedChatHistoryAsync to get allotted history messages as one string.
