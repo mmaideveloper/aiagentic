@@ -96,6 +96,8 @@ public sealed class Program
             });
         builder.Services.AddHealthChecks();
 
+        builder.Services.AddScoped<IPluginAuthCredentialsService, PluginAuthCredentialsService>();
+
         // Configure middleware and endpoints
         WebApplication app = builder.Build();
 

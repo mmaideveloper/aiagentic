@@ -117,18 +117,15 @@ internal static class SemanticKernelExtensions
 
         kernel.ImportPluginFromObject(new CustomDocumentServicePlugin
         {
-             variables,
-                customDSHeader,
-                this._httpClientFactory,
+                sp.GetService<IPluginAuthCredentialsService>().GetPluginAuthHeaders(),
+                sp.GetRequiredService<IHttpClientFactory>(),
                 1000,
-                this._logger,
-                this._configuration,
-                authenticationProvider,
+                sp.GetRequiredService<ILogger>(),
+                sp.GetRequiredService<IConfiguration>(),
                 kernel,
-                memoryClient: _memoryClient,
-                sourceRepository: _sourceRepository,
-                _messageRelayHubContext,
-               _messageRepository
+                sp.GetRequiredService<ChatMemorySourceRepository>(),
+                sp.GetRequiredService<IHubContext>(),
+                sp.GetRequiredService<ChatMessageRepository>()
         });
 
         return kernel;

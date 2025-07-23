@@ -39,8 +39,11 @@ public sealed class CustomDocumentServicePlugin
     private readonly string _authority;
     private readonly int _responseTokenLimit = 128000;
     private readonly IConfiguration _configuration;
+    
     private readonly BearerAuthenticationProvider _authenticationProvider;
+    //get filename
     private readonly ChatMemorySourceRepository _sourceRepository;
+    //send message
     private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
 
     /// <summary>
@@ -52,11 +55,12 @@ public sealed class CustomDocumentServicePlugin
     /// <summary>
     /// Client for the kernel memory service.
     /// </summary>
-    private readonly IKernelMemory _memoryClient;
+    //private readonly IKernelMemory _memoryClient;
 
-    private readonly ChatMessageRepository _messageRepository;
+    //private readonly ChatMessageRepository _messageRepository;
 
-    private readonly KernelArguments _variables;
+    //get chatid, userid..
+    //private readonly KernelArguments _variables;
     ///// <summary>
     ///// A repository to save and retrieve chat messages.
     ///// </summary>
@@ -97,7 +101,7 @@ public sealed class CustomDocumentServicePlugin
     //   PlannerOptions.OboOptions:
     //     Configuration for the plugin defined in appsettings.json.
     public CustomDocumentServicePlugin(
-        KernelArguments variables,
+        //KernelArguments variables,
         string bearerToken, 
         IHttpClientFactory clientFactory, 
         int responseTokenLimit, 
@@ -105,7 +109,7 @@ public sealed class CustomDocumentServicePlugin
         IConfiguration configuration,
         BearerAuthenticationProvider authenticationProvider,
         Kernel kernel,
-        IKernelMemory memoryClient,
+        //IKernelMemory memoryClient,
         //ChatMessageRepository chatMessageRepository,
         //ChatSessionRepository chatSessionRepository,
         //IHubContext<MessageRelayHub> messageRelayHubContext,
@@ -130,7 +134,7 @@ public sealed class CustomDocumentServicePlugin
         this._authenticationProvider = authenticationProvider;
 
         this._kernel = kernel;
-        this._memoryClient = memoryClient;
+        //this._memoryClient = memoryClient;
         //this._chatMessageRepository = chatMessageRepository;
         //this._chatSessionRepository = chatSessionRepository;
         //this._messageRelayHubContext = messageRelayHubContext;
@@ -140,8 +144,8 @@ public sealed class CustomDocumentServicePlugin
         //this._kernelMemoryRetriever = new KernelMemoryRetriever(promptOptions, chatSessionRepository, memoryClient, logger);
         this._sourceRepository = sourceRepository;
         this._messageRelayHubContext = messageRelayHubContext;
-        this._messageRepository = messageRepository;
-        this._variables = variables;
+        //this._messageRepository = messageRepository;
+        //this._variables = variables;
     }
 
     [KernelFunction("demo"), Description("check if custom document service is enabled.")]
@@ -151,17 +155,18 @@ public sealed class CustomDocumentServicePlugin
         KernelArguments context,
         CancellationToken cancellationToken = default)
     {
-        var chatIdString = _variables["chatId"].ToString();
+        var chatIdString = context["chatId"].ToString();
+        var userId = context["userId"].ToString();
         //var chatMessage = CopilotChatMessage.CreateBotResponseMessage(chatId, "testPLG", "testPromt", null);
-        await this.ShowMessage($"This is test custom document service plugin.{chatIdString}");
+        await this.ShowMessage($"This is test custom document service plugin.{chatIdString}", chatId, userId);
 
         return $"This is test custom document service plugin.{chatIdString} DateTime: {DateTime.UtcNow}";
     }
 
-    private async Task ShowMessage(string message)
+    private async Task ShowMessage(string message, string chatId, string userId)
     {
-        var chatId = _variables["chatId"].ToString();
-        var userId = _variables["userId"].ToString();
+        //var chatId = _variables["chatId"].ToString();
+        //var userId = _variables["userId"].ToString();
 
         /*
         // Create the stream
@@ -205,22 +210,23 @@ public sealed class CustomDocumentServicePlugin
     [KernelFunction("extract_fields_form_201_from_pdf_document"), 
         Description("Extracts structured fields from a PDF using the company's custom Document Intelligence model. Use this for all PDF field extraction.")]
     public async Task<string> CallApiTasksAsync(
+        KernelArguments context,
         [Description("string with the action")] string action,
         [Description("string with the document local path or url needed to execute the API call")]
         string filePath,
         [Description("string with file name that was upload, or ask for upload a file for that action")] string fileName,
         [Description("string with id of file that was uploaded")] string fileId,
-        [Description("file stream of bytes of uploaded files represented as base64")] string fileStreamAsString = null,
         [Description("string with the LLM module name needed to execute the API call")] string module = null,
         CancellationToken cancellationToken = default)
     {
-        var chatId = _variables["chatId"].ToString();
+        var chatId = context["chatId"].ToString();
+        var userId = context["userId"].ToString();
 
-        await this.ShowMessage("Initialize custom document service call...");
+        await this.ShowMessage("Initialize custom document service call...", chatId, userId);
 
         try {
 
-            await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}");
+            await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}", chatId, userId);
 
         
         var token = await _authenticationProvider.GetToken();
@@ -228,7 +234,7 @@ public sealed class CustomDocumentServicePlugin
         var apiUrl = plugins.FirstOrDefault(p => p.Name == "CustomDocumentService")?.ApiUrl;
         var apiToCall = $"{apiUrl}api/upload";
 
-            await this.ShowMessage($"Customer Document Intelligne Service {fileName} loaded.");
+            await this.ShowMessage($"Customer Document Intelligne Service {fileName} loaded.", chatId, userId);
 
             var graphResponseContent = string.Empty;
         var accessToken = token; // await this.GetAccessTokenAsync(cancellationToken);
@@ -237,13 +243,13 @@ public sealed class CustomDocumentServicePlugin
             {
                 using var form = new MultipartFormDataContent();
                 //using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                using var fileStream = await GetUploadedFile(filePath, fileName, fileId, fileStreamAsString, chatId);
+                using var fileStream = await GetUploadedFile(filePath, fileName, fileId);
                 using var streamContent = new StreamContent(fileStream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 form.Add(streamContent, "file", fileName );
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Request send to {apiToCall}");
+                await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Request send to {apiToCall}",chatId, userId);
 
                 // Send request to API
                 var response = await client.PostAsync($"{apiToCall}?model={module}", form);
@@ -251,16 +257,16 @@ public sealed class CustomDocumentServicePlugin
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await this.ShowMessage(resultW);
+                    await this.ShowMessage(resultW, chatId, userId);
 
-                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 finalized file: {fileName}. Sucessfully.");
+                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 finalized file: {fileName}. Sucessfully.", chatId, userId);
                     return resultW;
                 }
                 else
                 {
-                    await this.ShowMessage($"Error from {apiToCall}.{resultW} Status code: {response.Version.ToString()}");
+                    await this.ShowMessage($"Error from {apiToCall}.{resultW} Status code: {response.Version.ToString()}", chatId, userId);
 
-                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Failed.");
+                    await this.ShowMessage($"Customer Document Intelligne Service for FORM 201 processing file: {fileName}. Failed.", chatId, userId);
 
                 }
             }
@@ -268,13 +274,13 @@ public sealed class CustomDocumentServicePlugin
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling CustomDocumentServicePlugin: {Message}", ex.Message);
-            await this.ShowMessage(ex.Message);
+            await this.ShowMessage(ex.Message, chatId, userId);
         }
 
         return string.Empty;
     }
 
-    private async Task<FileStream> GetUploadedFile(string documentUrl, string fileName, string fileId, string fileStreamAsString, string chatId)
+    private async Task<FileStream> GetUploadedFile(string documentUrl, string fileName, string fileId)
     {
         var plugins = _configuration.GetSection("Plugins").Get<List<Plugin>>();
         var myPlugin = plugins.FirstOrDefault(p => p.Name == "CustomDocumentService");
@@ -295,13 +301,7 @@ public sealed class CustomDocumentServicePlugin
 
         fileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite);
 
-        if (!string.IsNullOrEmpty(fileStreamAsString))
-        {
-            byte[] data = Convert.FromBase64String(fileStreamAsString);
-            fileStream.Write(data, 0, data.Length);
-        }
-        else
-        {
+        
 
             //IEnumerable<MemorySource> sources = await this._sourceRepository.FindByChatIdAsync(chatId);
             IEnumerable<MemorySource> sources = await this._sourceRepository.FindByNameAsync(fileName);
@@ -314,7 +314,7 @@ public sealed class CustomDocumentServicePlugin
             byte[] data = fileObj.BinaryContent;
             fileStream.Write(data, 0, data.Length);
             fileStream.Position = 0;        
-        }
+        
 
         return fileStream;
     }

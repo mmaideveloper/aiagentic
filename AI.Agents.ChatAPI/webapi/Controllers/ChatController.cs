@@ -341,7 +341,7 @@ public class ChatController : ControllerBase, IDisposable
                 this._configuration, 
                 authenticationProvider,
                 kernel,
-                memoryClient: _memoryClient,
+                //memoryClient: _memoryClient,
                 sourceRepository: _sourceRepository,
                 _messageRelayHubContext,
                _messageRepository),
