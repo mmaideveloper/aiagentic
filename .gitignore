@@ -66,3 +66,4 @@ Thumbs.db
 /AI.Agentic.Fronend/wwwroot/static/js
 /AI.Agents.ChatAPI/tmp
 /AI.Agents.ChatAPI/webapi/data
+/AI.Agents.ChatAPI/webapi/appsettings.development.json
