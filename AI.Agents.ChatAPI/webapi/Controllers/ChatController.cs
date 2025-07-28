@@ -14,12 +14,15 @@ using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat;
+using CopilotChat.WebApi.Plugins.Services;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
+using CustomPlugins;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.KernelMemory;
@@ -58,6 +61,9 @@ public class ChatController : ControllerBase, IDisposable
 
     private readonly ChatMessageRepository _messageRepository;
 
+    public const string PLUGIN_CUSTOM_DOCUMENT_SERVICE = "customDocumentService";
+
+    private readonly IPluginAuthCredentialsService _pluginAuthCredentialsService;
     public ChatController(
         ILogger<ChatController> logger,
         IHttpClientFactory httpClientFactory,
@@ -70,7 +76,8 @@ public class ChatController : ControllerBase, IDisposable
         IKernelMemory memoryClient,
         ChatMemorySourceRepository sourceRepository,
         IHubContext<MessageRelayHub> messageRelayHubContext,
-        ChatMessageRepository messageRepository)
+        ChatMessageRepository messageRepository,
+        IPluginAuthCredentialsService pluginAuthCredentialsService)
     {
         this._logger = logger;
         this._httpClientFactory = httpClientFactory;
@@ -86,6 +93,8 @@ public class ChatController : ControllerBase, IDisposable
         _messageRelayHubContext = messageRelayHubContext;
 
         _messageRepository = messageRepository;
+        _pluginAuthCredentialsService = pluginAuthCredentialsService;
+
     }
 
     /// <summary>
@@ -242,7 +251,8 @@ public class ChatController : ControllerBase, IDisposable
             tasks.Add(this.RegisterMicrosoftGraphOBOPlugins(kernel, graphOboAuthHeader));
         }
 
-        if (authHeaders.TryGetValue("CUSTOMDOCUMENTINTELIGENCE", out string? customDocumentServiceAuthHeader))
+        authHeaders.TryGetValue("CUSTOMDOCUMENTINTELIGENCE", out string? customDocumentServiceAuthHeader);
+
         {
             tasks.Add(this.RegisterCustomDocumentServicePlugins(
                 kernel,customDocumentServiceAuthHeader, authHeaders,
@@ -322,8 +332,7 @@ public class ChatController : ControllerBase, IDisposable
         KernelArguments variables,
         ChatSession chat)
     {
-        const string PLUGIN_CUSTOM_DOCUMENT_SERVICE = "customDocumentService";
-
+        
         this._logger.LogInformation("Enabling Custom DS Plugin.");
         
         if (!kernel.Plugins.Any(p => p.Name == PLUGIN_CUSTOM_DOCUMENT_SERVICE))
@@ -332,24 +341,25 @@ public class ChatController : ControllerBase, IDisposable
 
         
         var plugin = kernel.ImportPluginFromObject(
+
             new CustomDocumentServicePlugin(
                 variables,
-                customDSHeader, 
+                _pluginAuthCredentialsService,//customDSHeader, 
                 this._httpClientFactory, 
                 1000, 
                 this._logger, 
                 this._configuration, 
                 authenticationProvider,
                 kernel,
-                //memoryClient: _memoryClient,
                 sourceRepository: _sourceRepository,
                 _messageRelayHubContext,
                _messageRepository),
             PLUGIN_CUSTOM_DOCUMENT_SERVICE);
         }
-
+        
+        var pluginE = chat.EnabledPlugins.FirstOrDefault(p => p == PLUGIN_CUSTOM_DOCUMENT_SERVICE);
         //
-        if(chat !=null && chat.EnabledPlugins.FirstOrDefault( p=> p == PLUGIN_CUSTOM_DOCUMENT_SERVICE) == null)
+        if (chat !=null && pluginE == null)
         {
             var chatIdString = chat.Id;
             chat.EnabledPlugins.Add(PLUGIN_CUSTOM_DOCUMENT_SERVICE);
@@ -357,6 +367,31 @@ public class ChatController : ControllerBase, IDisposable
             await _messageRelayHubContext.Clients.Group(chatIdString).SendAsync(PluginController.PluginStateChanged, chatIdString, PLUGIN_CUSTOM_DOCUMENT_SERVICE, true);
 
         }
+
+        //register email service
+
+        // Register chat archive embedding config
+        kernel.ImportPluginFromObject(new EmailAgent(
+            _configuration,
+            _messageRelayHubContext,
+            _pluginAuthCredentialsService,
+            variables,
+            _logger
+            ), "CustomEmailAgent");
+
+        kernel.ImportPluginFromObject(new MergeAquisitionCaseSearchPluginAgent(
+            _messageRelayHubContext,
+            _pluginAuthCredentialsService,
+            variables,
+            _logger
+            ), "MergeAquisitionCaseSearchPluginAgent");
+
+        kernel.ImportPluginFromObject(new PdfGeneratorAgent(
+            _messageRelayHubContext,
+            _pluginAuthCredentialsService,
+            variables,
+            _logger
+            ), "PdfGeneratorAgent");
     }
 
     /// <summary>

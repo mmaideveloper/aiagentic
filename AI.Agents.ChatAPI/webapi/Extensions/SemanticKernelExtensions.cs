@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using CopilotChat.WebApi.Controllers;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
@@ -51,6 +52,7 @@ internal static class SemanticKernelExtensions
 
                 // If KernelSetupHook is not null, invoke custom kernel setup.
                 sp.GetService<KernelSetupHook>()?.Invoke(sp, kernel);
+
                 return kernel;
             });
 
@@ -62,7 +64,7 @@ internal static class SemanticKernelExtensions
 
         // Add any additional setup needed for the kernel.
         // Uncomment the following line and pass in a custom hook for any complimentary setup of the kernel.
-        // builder.Services.AddKernelSetupHook(customHook);
+        //builder.Services.AddKernelSetupHook(customHook);
 
         return builder;
     }
@@ -111,22 +113,25 @@ internal static class SemanticKernelExtensions
             nameof(ChatPlugin));
         logger.BeginScope("Registering Custom Chat Copilot functions");
 
-        // Register chat archive embedding config
-        kernel.ImportPluginFromObject(new EmailAgent(sp.GetRequiredService<IConfiguration>()), "CustomEmailAgent");
-        logger.BeginScope("Registering Custom Email Copilot functions");
+        /*
+         //todo: to enable plugin per chat, import it in chatcontroller with
+        // new chat kernel argument variables
 
-        kernel.ImportPluginFromObject(new CustomDocumentServicePlugin
-        {
-                sp.GetService<IPluginAuthCredentialsService>().GetPluginAuthHeaders(),
+        _ = kernel.ImportPluginFromObject(new CustomDocumentServicePlugin
+        (
+                null,
+                sp.GetService<IPluginAuthCredentialsService>(),
                 sp.GetRequiredService<IHttpClientFactory>(),
                 1000,
                 sp.GetRequiredService<ILogger>(),
                 sp.GetRequiredService<IConfiguration>(),
+                bearerTokenProvider,
                 kernel,
                 sp.GetRequiredService<ChatMemorySourceRepository>(),
-                sp.GetRequiredService<IHubContext>(),
+                sp.GetRequiredService<IHubContext<MessageRelayHub>>(),
                 sp.GetRequiredService<ChatMessageRepository>()
-        });
+        ), ChatController.PLUGIN_CUSTOM_DOCUMENT_SERVICE);
+        */
 
         return kernel;
     }
