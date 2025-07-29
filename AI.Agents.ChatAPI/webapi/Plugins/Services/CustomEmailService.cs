@@ -65,17 +65,18 @@ namespace CopilotChat.WebApi.Plugins.Services
         }
 
         [KernelFunction("isenabled_custom_send_email"),
-        Description("Check if custom email sender is enabled")]
+        Description("Execute if user ask for check if custom email service is enabled")]
         public async Task<string> IsEnabled(
         [Description("Name of the user")] string userName)
         {
             var chatId = this._variables["chatId"];
             await ShowMessage($"Custom Email Service is enabled. Chat: {chatId} User:{userName}");
-            return "Enabled";
+            //todo check credentials
+            return "Custom Email Service is Enabled.";
         }
         
         [KernelFunction("send_email"),
-        Description("Send Email with data in chat and email and subject that user is required to add.")]
+        Description("Send Email. Email and subject user is required to add.")]
         public async Task<string> SendEmail(
             //KernelContent context,
             [Description("Recipient email address.")]
@@ -101,7 +102,8 @@ namespace CopilotChat.WebApi.Plugins.Services
             {
                 From = new MailAddress(smtpSection.Username),
                 Subject = subject,
-                Body = body
+                Body = body,
+                IsBodyHtml = true,             
             };
             mail.To.Add(email);
             client.Send(mail);

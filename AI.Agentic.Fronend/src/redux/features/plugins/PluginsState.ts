@@ -149,7 +149,7 @@ export const initialState: PluginsState = {
             publisher: 'MM',
             description:
                 'Custom form 201 document service',
-            enabled: false,
+            enabled: true,
             authRequirements: {
                 Msal: true,
                 scopes: Constants.plugins.customAzureDocServiceScopes,
